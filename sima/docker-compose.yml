@@ -1,0 +1,57 @@
+version: '3.2'
+
+networks:
+  network:
+
+services:
+
+  mpd_sima:
+    container_name: mpd_sima
+    image: kaliko/sima
+    build:
+      context: ./sima
+    depends_on:
+      - mpd
+    restart: always
+    env_file: .env
+    networks:
+      network:
+        aliases:
+          - sima
+          - mpd-sima
+
+  icecast:
+    container_name: icecast
+    image: kaliko/icecast
+    build:
+      context: ./icecast
+    env_file: .env
+    ports:
+      - ${ICECAST_EXPOSE_PORT:-8000}:8000
+    networks:
+      network:
+        aliases:
+          - radio
+
+  mpd:
+    container_name: musicpd
+    image: kaliko/mpd
+    build:
+      context: ./mpd
+    env_file: .env
+    depends_on:
+      - icecast
+    volumes:
+      - type: bind
+        source: ${MPD_MUSIC_DIRECTORY:?Please provide MPD_MUSIC_DIRECTORY env. var.}
+        target: /music
+        read_only: true
+    ports:
+      - ${MPD_EXPOSE_PORT:-6600}:6600
+    networks:
+      network:
+        aliases:
+          - musicpd
+          - musicplayerdaemon
+          - daemon
+

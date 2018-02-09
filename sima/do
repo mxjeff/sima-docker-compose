@@ -1,0 +1,41 @@
+#!/bin/sh
+
+ROOT=$(dirname $(readlink -f $0))
+SCRIPT=$(basename $0)
+
+_inspect () {
+    # Auto generate help string
+    local help=$(awk '$1 ~ /^[a-z]+_?[_a-z]+$/ && $2 == "()" { printf "%s|", $1 }' $0)
+    echo ${help%|}
+}
+
+_is_exe () {
+    command -v $1 >/dev/null 2>&1 || { echo >&2 "missing $1 command"; return 1; }
+    return 0
+}
+#-----------------------------------------------------------------------------#
+
+if [ $# -eq 0 ]
+then
+    echo "${ROOT}/${SCRIPT} $(_inspect)"
+    exit
+fi
+
+install_docker_compose () {
+  rm -rf ${ROOT}/venv
+  _is_exe python3 || { echo Missing python3!; exit 1; }
+  python3 -m venv venv
+  . ${ROOT}/venv/bin/activate
+  pip install docker-compose
+  ${ROOT}/venv/bin/deactivate
+}
+
+
+up () {
+  _is_exe docker-compose || { echo Need docker-compose, run ./do install_docker_compose to install; exit 1; }
+  docker-compose up -d
+}
+
+$@
+
+# vim: fileencoding=utf8 ft=sh

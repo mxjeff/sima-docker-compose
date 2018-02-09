@@ -1,0 +1,16 @@
+#!/bin/sh
+
+OPTIONS="--config /etc/mpd-sima.cfg"
+
+case "${MPD_SIMA_MODE:-empty}" in
+  top)
+    OPTIONS="--config /etc/mpd-sima.top.cfg"
+    ;;
+  album)
+    OPTIONS="--config /etc/mpd-sima.album.cfg"
+    ;;
+esac
+
+. /var/lib/mpd-sima/bin/activate
+mpd-sima ${DEBUG:+-v debug} ${OPTIONS}
+
