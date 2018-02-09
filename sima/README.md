@@ -2,7 +2,7 @@
 
 ## Warning
 
-**Default icecast passwords are unchanged !**
+**Default icecast passwords are unchanged !**  
 Change them to expose icecast on a public IP.
 
 ## tl,dr
